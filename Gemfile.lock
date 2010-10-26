@@ -1,0 +1,71 @@
+GEM
+  remote: http://rubygems.org/
+  specs:
+    abstract (1.0.0)
+    bunny (0.6.0)
+    chef (0.9.10.rc.0)
+      bunny (>= 0.6.0)
+      erubis
+      extlib
+      highline
+      json (>= 1.4.4, <= 1.4.6)
+      mixlib-authentication (>= 1.1.0)
+      mixlib-cli (>= 1.1.0)
+      mixlib-config (>= 1.1.2)
+      mixlib-log (>= 1.1.0)
+      moneta
+      ohai (>= 0.5.7)
+      rest-client (>= 1.0.4, < 1.7.0)
+      uuidtools
+    daemons (1.1.0)
+    erubis (2.6.6)
+      abstract (>= 1.0.0)
+    eventmachine (0.12.10)
+    extlib (0.9.15)
+    highline (1.6.1)
+    json (1.4.6)
+    mime-types (1.16)
+    mixlib-authentication (1.1.4)
+      mixlib-log
+    mixlib-cli (1.2.0)
+    mixlib-config (1.1.2)
+    mixlib-log (1.1.0)
+    moneta (0.6.0)
+    mustache (0.11.2)
+    ohai (0.5.7)
+      extlib
+      json (>= 1.4.4, <= 1.4.6)
+      mixlib-cli
+      mixlib-config
+      mixlib-log
+      systemu
+    rack (1.2.1)
+    rake (0.8.7)
+    redis (2.0.10)
+    rest-client (1.6.1)
+      mime-types (>= 1.16)
+    rspec (1.3.0)
+    sinatra (1.0)
+      rack (>= 1.0)
+    systemu (1.2.0)
+    thin (1.2.7)
+      daemons (>= 1.0.9)
+      eventmachine (>= 0.12.6)
+      rack (>= 1.0.0)
+    uuidtools (2.1.1)
+    yajl-ruby (0.7.8)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  chef (= 0.9.10.rc)
+  daemons
+  mustache
+  rack
+  rake
+  redis
+  rspec (~> 1.3.0)
+  sinatra
+  thin
+  yajl-ruby

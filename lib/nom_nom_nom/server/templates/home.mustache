@@ -1,0 +1,17 @@
+<div class="nodeList" id="nodeList">
+</div>
+
+<div class="nodeDetailContainer" id="nodeListContainer">
+  
+</div>
+
+<script type="text/javascript" charset="utf-8">
+  $(document).ready(function() {
+    $.getJSON('/api/nodes', {}, function(nodeList) {
+      var nodeListUl = $("div#nodeList");
+      for (i in nodeList) {
+        nodeListUl.append('<div class="node">' + nodeList[i] + '</div>')
+      }
+    })
+  })
+</script>

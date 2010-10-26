@@ -1,0 +1,102 @@
+#!/usr/bin/env ruby
+
+require 'pp'
+require 'optparse'
+require 'rubygems'
+
+# For now we'll assume bundler installs only:
+# Force ourselves to be in the right dir for bundler to find the Gemfile
+Dir.chdir(File.expand_path("../..", __FILE__)) do
+  require 'bundler/setup'
+end
+
+require 'chef'
+
+$:.unshift(File.expand_path('../../lib', __FILE__))
+require 'nom_nom_nom/status_handler'
+
+class ReportGenerator
+
+  attr_reader :run_status
+
+  def initialize(status_url, opts={})
+    setup_reporting_data
+    @handler = NomNomNom::StatusHandler.new(status_url)
+  end
+
+  def generate
+    @handler.run_report_safely(@run_status)
+  end
+
+  private
+
+  def setup_reporting_data
+    @node = Chef::Node.new
+    @node.name("appserver.example.com")
+
+    @run_context = Chef::RunContext.new(@node, {})
+    @run_status = Chef::RunStatus.new(@node)
+
+    # Has to go *after* RunContext.new or else chef tries to load recipes from
+    # the server :(
+    @node.run_list('recipe[sudo]', 'role[base]')
+    @node.automatic_attrs.merge!("recipes" => ["sudo::default", "app::server", "hosts::default"], "roles" => ["base", "appserver"])
+
+    @run_status.run_context = @run_context
+
+    @run_status.start_clock
+    @run_status.instance_variable_set(:@end_time, Time.new + 23)
+
+    @sudo_pkg_resource = Chef::Resource::Package.new("sudo")
+    @config_file_resource = Chef::Resource::Template.new("/etc/app/config.conf")
+
+    @sudo_pkg_resource.updated_by_last_action(true)
+    @run_context.resource_collection << @sudo_pkg_resource 
+    @run_context.resource_collection << @config_file_resource
+
+    @sudo_cookbook = Chef::CookbookVersion.new("sudo")
+    @sudo_cookbook.version = "1.2.3"
+
+    @app_cookbook = Chef::CookbookVersion.new("app")
+    @app_cookbook.version = '4.2.0'
+
+    @run_context.cookbook_collection['sudo'] = @sudo_cookbook
+    @run_context.cookbook_collection['app']  = @app_cookbook
+  end
+
+end
+
+module NomNomTestOptions
+
+  @parser  = OptionParser.new do |o|
+    o.banner = "usage: #{File.basename(__FILE__)} STATUS_SERVER_URL [options]"
+
+    o.on("-F", "--[no-]fail", "simulate a failed chef run") do |f|
+      @options[:fail] = v
+    end
+
+    o.on_tail("-h", "--help", "Show this message") do
+      puts o
+      puts
+      exit 1
+    end
+
+  end
+
+  def self.parser
+    @parser
+  end
+
+  def self.parse(argv)
+    @options = {}
+    parser.parse(argv)
+    @options
+  end
+
+end
+
+argv = ARGV.dup
+options = NomNomTestOptions.parse(argv)
+puts "POSTing generated report to #{argv.first}"
+ReportGenerator.new(argv.first, options).generate
+puts "success"
