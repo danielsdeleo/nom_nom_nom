@@ -147,8 +147,27 @@ describe NomNomNom::Status do
       end
     end
 
+    describe "when converting a failure status to a hash" do
+      before do
+        @exception = RuntimeError.new("oops!")
+        @backtrace = caller
+        @exception.set_backtrace(@backtrace)
+        @run_status.exception = @exception
+        @status_hash = NomNomNom::Status.from_run_status(@run_status).to_hash
+      end
+
+      it "has the exception class and message" do
+        @status_hash[:exception].should == "RuntimeError: oops!"
+      end
+
+      it "has the exception backtrace" do
+        @status_hash[:exception_backtrace].should == @backtrace
+      end
+
+    end
+
     describe "when loading from a hash" do
-      it "does something" do
+      it "is identical to itself before serializing" do
         NomNomNom::Status.from_hash(@status.to_hash).should == @status
       end
     end

@@ -1,14 +1,187 @@
-div#nodeList{
+div#container{
+  background-color:#efefef;
   padding:1em;
+  width:80em;
 }
 
-div.node{
-  border: 2px solid black;
+div#header{
+  background-color:#1f1f1f;
+  background:-webkit-gradient(linear, left top, left bottom, from(#1f1f1f), to(#696969));
+  background: -moz-linear-gradient(top,  #1f1f1f,  #696969);
+  width:100%;
+  font-size:3em;
+  text-align:center;
+
+  color:#f9f9f9;
+
+  font-weight:bold;
+  text-shadow: #0f0f0f 1px 1px 0px;
+}
+
+div#footer{
+  width:100%;
+  min-height:3em;
+  /*text-align:center; */
+  clear:both;
+  background-color:#999;
+  background:-webkit-gradient(linear, left top, left bottom, from(#999), to(#ccc));
+  background: -moz-linear-gradient(top,  #999,  #ccc);
+}
+
+div#footer p{
+  margin-left:1em;
+}
+
+div#mainContentContainer{
+  padding:0.5em;
+  background-color:#999;
+}
+
+div#mainContentContainerExpander{
+  clear:both;
+}
+
+div.horizontalSeparator{
+  min-height:38em;
+  width:2px;
+  float:left;
+  background-color:#696969;
+  height:100%;
+  margin:0.5em;
+}
+
+div#nodeList{
   background-color:#efefef;
-  height:2em;
-  width: 20em;
-  padding:1em;
-  -webkit-border-radius:5px;
-  -moz-border-radius:5px;
+  min-height:40em;
+  border:1px solid #696969;
+  -webkit-border-radius:10px;
+  -moz-border-radius:10px;
   border-radius:10px;
+  /*padding:1em;*/
+  width:30%;
+  height:100%;
+  float:left;
+}
+
+/* Touch up the ugly "boxing out" of the contained div when its background color is set */
+div.nodeList > *:nth-child(1) {
+  -webkit-border-top-left-radius: 9px;
+  -webkit-border-top-right-radius: 9px;
+  -moz-border-radius-topleft: 9px;
+  -moz-border-radius-topright: 9px;
+  border-top-left-radius: 9px;
+  border-top-right-radius: 9px;
+}
+/*
+div.nodeList > *:nth-child(1) span.nodeStatus {
+  -webkit-border-top-left-radius: 9px;
+  -moz-border-radius-topleft: 9px;
+  border-top-left-radius: 9px;
+}
+*/
+
+div.node{
+  cursor:pointer;
+  border-bottom: 1px solid #696969;
+  height:3.5em;
+  line-height:3.5em;
+}
+
+/*div.node.failed{
+  background:-webkit-gradient(linear, left top, right bottom, from(#ef3f3f), to(#efefef));
+  background: -moz-linear-gradient(left,  #999,  #ccc);
+}*/
+
+span.nodeName{
+  display:inline-block;
+  padding-left:1em;
+}
+
+div.node.highlighted{
+  background-color:#3875d7;
+  color:#fff;
+  font-weight:bold;
+}
+
+span.nodeStatus{
+  margin-left:5px;
+  width:20px;
+  height:20px;
+  vertical-align:middle;
+  -webkit-border-radius:11px;
+  -moz-border-radius:11px; 
+  border-radius:11px;
+  border:1px solid #393939;
+/*  padding:1em; */
+  background-color:green;
+  background:-webkit-gradient(radial, 10 50%, 3, 10 50%, 10, from(#4fff4f), to(#9a9));
+  background: -moz-radial-gradient(10px 50%, 3px, 10px 50%, 10px, from(#4fff4f), to(#9a9)) no-repeat;
+  display:inline-block;
+}
+
+span.nodeStatus.failed {
+  background-color:red;
+  
+  background:-webkit-gradient(radial, 10 50%, 0, 10 50%, 10, from(#ff4f4f), to(#855));
+  background: -moz-radial-gradient(10px 50%, 3px, 10px 50%, 10px, from(#ff4f4f), to(#855)) no-repeat;
+}
+
+h3.nodeHistoryItemHeading{
+  background:-webkit-gradient(linear, left top, left bottom, from(#ccc), to(#999));
+  background: -moz-linear-gradient(top,  #ccc,  #999);
+  padding:0.5em 0em 0.5em 1em;
+}
+
+div.nodeHistoryItemContainer{
+  padding-left:1em;
+}
+
+h4.nodeResource{
+  padding:0.5em 0 0.5em 0;
+  border-bottom:1px solid #696969;
+}
+
+div#nodeDetailContainer{
+  -webkit-border-radius:10px;
+  -moz-border-radius:10px;
+  border-radius:10px;
+  min-height:40em;
+  background-color:#efefef;
+  width:65%;
+  float:left;
+}
+
+div.nodeHistoryItem{
+}
+
+h1.nodeDetailHeader{
+  -webkit-border-top-left-radius: 10px;
+  -webkit-border-top-right-radius: 10px;
+  -moz-border-radius-topleft: 10px;
+  -moz-border-radius-topright: 10px; 
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+
+  background-color:#1f1f1f;
+  background:-webkit-gradient(linear, left top, left bottom, from(#1f1f1f), to(#696969));
+  background: -moz-linear-gradient(top,  #1f1f1f,  #696969);
+  width:100%;
+
+  font-size:1.3em;
+  padding-top:0.2em;
+  padding-bottom:0.2em;
+
+  text-align:center;
+
+  color:#fff;
+
+  font-weight:bold;
+}
+
+div pre{
+ /* background-color:#efefef; */
+}
+
+pre.rubyCode{
+  white-space:pre;
 }

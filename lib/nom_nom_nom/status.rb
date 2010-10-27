@@ -67,7 +67,9 @@ module NomNomNom
         :node              => node,
         :recipes           => recipes,
         :roles             => roles,
-        :success           => success? }
+        :success           => success?,
+        :exception         => (exception),
+        :exception_backtrace => backtrace }
     end
 
     alias :for_json :to_hash
@@ -83,7 +85,9 @@ module NomNomNom
       @node              = hash['node']
       @recipes           = hash['recipes']
       @roles             = hash['roles']
-      @success           = hash['success']
+
+      @exception         = hash["exception"]
+      @backtrace         = hash["exception_backtrace"]
 
       self
     end

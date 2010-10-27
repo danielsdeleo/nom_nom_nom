@@ -1,16 +1,95 @@
-<div class="nodeList" id="nodeList">
+<div id="header">
+  Node Status
+</div>
+<div id="mainContentContainer">
+  <div class="nodeList" id="nodeList"></div>
+
+  <div class="horizontalSeparator"></div>
+
+  <div class="nodeDetailContainer" id="nodeDetailContainer"></div>
+
+  <div id="mainContentContainerExpander"></div>
+
 </div>
 
-<div class="nodeDetailContainer" id="nodeListContainer">
-  
+<div id="footer">
+  <p>Copyright &copy; 2010 Daniel DeLeo</p>
+  <p>nom nom nom nom nom nom nom nom nom nom nom nom nom nom 
+     nom nom nom nom nom nom nom nom nom nom nom nom nom nom
+     nom nom nom nom nom nom</p>
 </div>
 
 <script type="text/javascript" charset="utf-8">
+  var createNodeListItem = function(nodeListContainer, nodeName, nodeStatus) {
+    var node_elem_id = nodeName.replace(/\./g, '_');
+    nodeListContainer.append('<div id="' + node_elem_id + '" class="node ' + nodeStatus + '"><span class="nodeName">' + nodeName + '</span></div>')
+    var nodeItem = $('div.node#' + node_elem_id);
+    nodeItem.prepend('<span class="nodeStatus ' + nodeStatus + '"></span>');
+    nodeItem.click(function() {
+      $('div.node').removeClass("highlighted");
+      nodeItem.addClass("highlighted");
+      showNodeHistory(nodeName);
+    })
+  };
+
+  var showNodeResources = function(nodeHistoryContainer, nodeHistoryItem) {
+    var resourceElements = [];
+    var resourceCount = 0;
+
+    // build up html to append first so we can get the count of resources
+    for (resource in nodeHistoryItem.all_resources) {
+      resourceCount += 1;
+      //alert(nodeHistoryItem.all_resources[resource]);
+      resourceElements.push('<h4 class="nodeResource">' + resource + '</h3>');
+      resourceElements.push('<div><pre class="rubyCode sh_ruby">' + nodeHistoryItem.all_resources[resource] + '</pre></div>');
+    }
+
+    nodeHistoryContainer.append('<h3 class="nodeHistoryItemHeading">All Resources (' + resourceCount + ' total) </h3>');
+    nodeHistoryContainer.append('<div class="nodeHistoryItemContainer"></div>')
+
+    var nodeHistoryItemContainer = $('div.nodeHistoryItemContainer:last');
+
+    for (i = 0; i < resourceElements.length; i += 1){
+      nodeHistoryItemContainer.append(resourceElements[i]);
+    }
+    
+  };
+
+  var showNodeHistoryItem = function(nodeHistoryContainer, nodeName, nodeHistoryItem) {
+    showNodeResources(nodeHistoryContainer, nodeHistoryItem)
+
+    nodeHistoryContainer.append('<h3 class="nodeHistoryItemHeading">Roles</h3>');
+    for (i = 0; i < nodeHistoryItem.roles.length; i += 1){
+      nodeHistoryContainer.append('<div class="role">' + nodeHistoryItem.roles[i] + '</div>');
+    }
+    sh_highlightDocument();
+
+    //nodeHistoryContainer.append(nodeHistoryItem);
+  }
+
+  var showNodeHistory = function(nodeName) {
+    $.getJSON('/api/nodes/' + nodeName, {}, function(nodeHistory) {
+      //alert(nodeHistory);
+      var i;
+      var nodeDetailContainer = $('div#nodeDetailContainer')
+      $('div#nodeDetailContainer *').remove();
+
+      nodeDetailContainer.append('<h1 class="nodeDetailHeader">'+ nodeName + '</h1>');
+
+      for (i = 0; i < nodeHistory.length; i += 1) {
+        var nodeHistoryDivID = 'node_history_' + i;
+        //alert(nodeHistory[i]);
+        nodeDetailContainer.append('<div id="' + nodeHistoryDivID + '" class="nodeHistoryItem"></div>');
+        showNodeHistoryItem($('div#' + nodeHistoryDivID), nodeName, $.parseJSON(nodeHistory[i]));
+      }
+    })
+  };
+
   $(document).ready(function() {
     $.getJSON('/api/nodes', {}, function(nodeList) {
-      var nodeListUl = $("div#nodeList");
-      for (i in nodeList) {
-        nodeListUl.append('<div class="node">' + nodeList[i] + '</div>')
+      var nodeListContainer = $("div#nodeList");
+      for (i = 0; i < nodeList.length; i += 1) {
+        createNodeListItem(nodeListContainer, nodeList[i][0], nodeList[i][1]);
       }
     })
   })

@@ -20,6 +20,7 @@ class ReportGenerator
   attr_reader :run_status
 
   def initialize(status_url, opts={})
+    @options = opts
     setup_reporting_data
     @handler = NomNomNom::StatusHandler.new(status_url)
   end
@@ -32,7 +33,7 @@ class ReportGenerator
 
   def setup_reporting_data
     @node = Chef::Node.new
-    @node.name("appserver.example.com")
+    @node.name(@options[:name] || "appserver.example.com")
 
     @run_context = Chef::RunContext.new(@node, {})
     @run_status = Chef::RunStatus.new(@node)
@@ -62,6 +63,13 @@ class ReportGenerator
 
     @run_context.cookbook_collection['sudo'] = @sudo_cookbook
     @run_context.cookbook_collection['app']  = @app_cookbook
+
+    if @options[:fail]
+      exception = RuntimeError.new("oops")
+      exception.set_backtrace(caller)
+      @run_status.exception = exception
+    end
+
   end
 
 end
@@ -72,7 +80,11 @@ module NomNomTestOptions
     o.banner = "usage: #{File.basename(__FILE__)} STATUS_SERVER_URL [options]"
 
     o.on("-F", "--[no-]fail", "simulate a failed chef run") do |f|
-      @options[:fail] = v
+      @options[:fail] = f
+    end
+
+    o.on("-n NODE_NAME", "--name NODE_NAME", "use a different node name") do |name|
+      @options[:name] = name
     end
 
     o.on_tail("-h", "--help", "Show this message") do
@@ -87,16 +99,16 @@ module NomNomTestOptions
     @parser
   end
 
-  def self.parse(argv)
+  def self.parse!(argv)
     @options = {}
-    parser.parse(argv)
+    parser.parse!(argv)
     @options
   end
 
 end
 
 argv = ARGV.dup
-options = NomNomTestOptions.parse(argv)
+options = NomNomTestOptions.parse!(argv)
 puts "POSTing generated report to #{argv.first}"
 ReportGenerator.new(argv.first, options).generate
 puts "success"

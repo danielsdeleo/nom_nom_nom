@@ -29,7 +29,10 @@ module NomNomNom
         end
 
         def list_nodes
-          redis { |r| r.smembers("nodes")}
+          all_nodes = []
+          failed_nodes.each { |n| all_nodes << [n, "failed"] }
+          successful_nodes.each { |n| all_nodes << [n, "successful"]}
+          all_nodes
         end
 
         def failed_nodes
