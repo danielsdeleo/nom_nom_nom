@@ -13,7 +13,7 @@
 </div>
 
 <div id="footer">
-  <p>Copyright &copy; 2010 Daniel DeLeo</p>
+  <p>Copyright &copy; 2010 Opscode, Inc.</p>
   <p>nom nom nom nom nom nom nom nom nom nom nom nom nom nom 
      nom nom nom nom nom nom nom nom nom nom nom nom nom nom
      nom nom nom nom nom nom</p>
@@ -32,40 +32,113 @@
     })
   };
 
+  var createNodeHistorySubItem = function(title, container) {
+    var showMoreContentHint = '<img class="clickToSeeMore" alt="clickToSeeMore" width="8" src="img/down_triangle.png?foo" />';
+    var showLessContentHint = '<img class="clickToSeeLess" alt="clickToSeeLess" width="8" src="img/up_triangle.png?foo" />';
+    var hintToggleImg = '<span class="hintToggleImg">' + showMoreContentHint + showLessContentHint + '</span>';
+    var titleSpan = '<span class="nodeHistoryItemHeadingText">' + title + '</span>'
+    container.append('<div class="nodeHistoryItemHeading">' + hintToggleImg + titleSpan + '</div>');
+    container.append('<div class="nodeHistoryItemContainer"></div>');
+
+    var subItemContainer = $('div.nodeHistoryItemContainer:last')
+    var clickToSeeMore = $('img.clickToSeeMore:last')
+    var clickToSeeLess = $('img.clickToSeeLess:last')
+
+    $('div.nodeHistoryItemHeading:last').click(function() {
+      subItemContainer.slideToggle('fast');
+      clickToSeeMore.toggle();
+      clickToSeeLess.toggle();
+    });
+
+    return {heading : $('div.nodeHistoryItemHeading:last'), container: subItemContainer };
+  };
+
+  var showNodeCookbooksList = function(nodeHistoryContainer, nodeHistoryItem) {
+    var resourcesSubItem = createNodeHistorySubItem('Cookbooks', nodeHistoryContainer);
+    for (cookbook in nodeHistoryItem.cookbooks) {
+      resourcesSubItem.container.append('<div>' + cookbook + ": " + nodeHistoryItem.cookbooks[cookbook] + "</div>");
+    }
+  };
+
   var showNodeResources = function(nodeHistoryContainer, nodeHistoryItem) {
     var resourceElements = [];
     var resourceCount = 0;
+    var updatedCount = 0;
 
     // build up html to append first so we can get the count of resources
     for (resource in nodeHistoryItem.all_resources) {
+      if (nodeHistoryItem.updated_resources.hasOwnProperty(resource)){
+        var updated = "updated";
+        updatedCount += 1;
+      }
+      else {
+        var updated = "notUpdated";
+      }
+
       resourceCount += 1;
-      //alert(nodeHistoryItem.all_resources[resource]);
-      resourceElements.push('<h4 class="nodeResource">' + resource + '</h3>');
-      resourceElements.push('<div><pre class="rubyCode sh_ruby">' + nodeHistoryItem.all_resources[resource] + '</pre></div>');
+      resourceElements.push('<h4 class="nodeResource ' + updated + '">' + resource + '</h4>');
+      resourceElements.push('<div class="resourceCodeContainer"><pre class="rubyCode sh_ruby">' + nodeHistoryItem.all_resources[resource] + '</pre></div>');
     }
 
-    nodeHistoryContainer.append('<h3 class="nodeHistoryItemHeading">All Resources (' + resourceCount + ' total) </h3>');
-    nodeHistoryContainer.append('<div class="nodeHistoryItemContainer"></div>')
-
-    var nodeHistoryItemContainer = $('div.nodeHistoryItemContainer:last');
+    var resourcesSubItem = createNodeHistorySubItem('All Resources (' + updatedCount + ' updated, ' + resourceCount + ' total)', nodeHistoryContainer);
 
     for (i = 0; i < resourceElements.length; i += 1){
-      nodeHistoryItemContainer.append(resourceElements[i]);
+      resourcesSubItem.container.append(resourceElements[i]);
     }
     
   };
 
-  var showNodeHistoryItem = function(nodeHistoryContainer, nodeName, nodeHistoryItem) {
-    showNodeResources(nodeHistoryContainer, nodeHistoryItem)
+  var showNodeRoles = function(nodeHistoryContainer, nodeHistoryItem) {
+    var rolesSubItem = createNodeHistorySubItem('Roles', nodeHistoryContainer);
 
-    nodeHistoryContainer.append('<h3 class="nodeHistoryItemHeading">Roles</h3>');
     for (i = 0; i < nodeHistoryItem.roles.length; i += 1){
-      nodeHistoryContainer.append('<div class="role">' + nodeHistoryItem.roles[i] + '</div>');
+      rolesSubItem.container.append('<div class="role">' + nodeHistoryItem.roles[i] + '</div>');
     }
+  };
+
+  var showNodeRecipes = function(nodeHistoryContainer, nodeHistoryItem) {
+    var rolesSubItem = createNodeHistorySubItem('Recipes', nodeHistoryContainer);
+
+    for (i = 0; i < nodeHistoryItem.roles.length; i += 1){
+      rolesSubItem.container.append('<div class="recipe">' + nodeHistoryItem.recipes[i] + '</div>');
+    }
+  };
+
+  var showNodeException = function(nodeHistoryContainer, nodeHistoryItem) {
+    if (nodeHistoryItem.success == false){
+      var exceptionSubItem = createNodeHistorySubItem('Exception Detail', nodeHistoryContainer);
+      exceptionSubItem.container.append('<h4 class="exceptionMessage">' + nodeHistoryItem.exception + "</h4>");
+      var joinedBacktrace = nodeHistoryItem.exception_backtrace.join("\n");
+      exceptionSubItem.container.append('<div class="backtrace"><pre>' + joinedBacktrace + '</pre></div>');
+      exceptionSubItem.heading.click();
+    }
+  };
+
+  var showRunHeading = function(nodeHistoryContainer, nodeHistoryItem, runID){
+    var run_start_datetime = new Date(Date.parse(nodeHistoryItem.start_time));
+    if(nodeHistoryItem.success == true) {
+      runHeadingClass = "successful"
+    }
+    else {
+      runHeadingClass = "failed"
+    }
+    var containerId  = 'runHeadingContainer_' + runID;
+    var runHeadingId = 'runHeading_' + runID;
+    nodeHistoryContainer.append('<div id="' + containerId + '" class="runHeadingContainer '+ runHeadingClass +'"></div>');
+    $('div#' + containerId).append('<h2 id="' + runHeadingId + '" class="runHeading">' + run_start_datetime + '</h2>');
+    
+  };
+
+  var showNodeHistoryItem = function(nodeHistoryContainer, nodeName, nodeHistoryItem) {
+    showNodeException(nodeHistoryContainer, nodeHistoryItem);
+    showNodeRoles(nodeHistoryContainer, nodeHistoryItem);
+    showNodeRecipes(nodeHistoryContainer, nodeHistoryItem);
+    showNodeCookbooksList(nodeHistoryContainer, nodeHistoryItem);
+    showNodeResources(nodeHistoryContainer, nodeHistoryItem);
+
     sh_highlightDocument();
 
-    //nodeHistoryContainer.append(nodeHistoryItem);
-  }
+  };
 
   var showNodeHistory = function(nodeName) {
     $.getJSON('/api/nodes/' + nodeName, {}, function(nodeHistory) {
@@ -74,13 +147,14 @@
       var nodeDetailContainer = $('div#nodeDetailContainer')
       $('div#nodeDetailContainer *').remove();
 
-      nodeDetailContainer.append('<h1 class="nodeDetailHeader">'+ nodeName + '</h1>');
+      nodeDetailContainer.append('<h1 class="nodeDetailHeader">Run History - '+ nodeName + '</h1>');
 
       for (i = 0; i < nodeHistory.length; i += 1) {
         var nodeHistoryDivID = 'node_history_' + i;
-        //alert(nodeHistory[i]);
+        var nodeHistoryItem = $.parseJSON(nodeHistory[i]);
+        showRunHeading(nodeDetailContainer, nodeHistoryItem, i);
         nodeDetailContainer.append('<div id="' + nodeHistoryDivID + '" class="nodeHistoryItem"></div>');
-        showNodeHistoryItem($('div#' + nodeHistoryDivID), nodeName, $.parseJSON(nodeHistory[i]));
+        showNodeHistoryItem($('div#' + nodeHistoryDivID), nodeName, nodeHistoryItem);
       }
     })
   };
