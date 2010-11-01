@@ -16,7 +16,7 @@
   <p>Copyright &copy; 2010 Opscode, Inc.</p>
   <p>nom nom nom nom nom nom nom nom nom nom nom nom nom nom 
      nom nom nom nom nom nom nom nom nom nom nom nom nom nom
-     nom nom nom nom nom nom</p>
+     nom nom nom nom nom nom nom nom nom nom nom </p>
 </div>
 
 <script type="text/javascript" charset="utf-8">
@@ -62,25 +62,20 @@
 
   var showNodeResources = function(nodeHistoryContainer, nodeHistoryItem) {
     var resourceElements = [];
-    var resourceCount = 0;
-    var updatedCount = 0;
-
     // build up html to append first so we can get the count of resources
     for (resource in nodeHistoryItem.all_resources) {
       if (nodeHistoryItem.updated_resources.hasOwnProperty(resource)){
         var updated = "updated";
-        updatedCount += 1;
       }
       else {
         var updated = "notUpdated";
       }
 
-      resourceCount += 1;
       resourceElements.push('<h4 class="nodeResource ' + updated + '">' + resource + '</h4>');
       resourceElements.push('<div class="resourceCodeContainer"><pre class="rubyCode sh_ruby">' + nodeHistoryItem.all_resources[resource] + '</pre></div>');
     }
 
-    var resourcesSubItem = createNodeHistorySubItem('All Resources (' + updatedCount + ' updated, ' + resourceCount + ' total)', nodeHistoryContainer);
+    var resourcesSubItem = createNodeHistorySubItem('Resources', nodeHistoryContainer);
 
     for (i = 0; i < resourceElements.length; i += 1){
       resourcesSubItem.container.append(resourceElements[i]);
@@ -114,6 +109,32 @@
     }
   };
 
+  var showNodeSummary = function(nodeHistoryContainer, nodeHistoryItem) {
+    // Summarize resources info
+    var totalResources = 0;
+    var updatedResources = 0;
+
+    for (resource in nodeHistoryItem.all_resources) {
+      totalResources += 1;
+    }
+    for (resource in nodeHistoryItem.updated_resources) {
+      updatedResources += 1;
+    }
+
+    // Summarize run elapsed time
+    var startedAt = Date.parse(nodeHistoryItem.start_time);
+    var finishedAt = Date.parse(nodeHistoryItem.finish_time);
+    var elapsed = (finishedAt - startedAt) / 1000;
+
+    // display it
+    var summarySubItem = createNodeHistorySubItem('Summary', nodeHistoryContainer);
+    summarySubItem.container.append('<div class="nodeRuntimeSummary"> Runtime: ' + elapsed + "s</div>" );
+    summarySubItem.container.append('<div class="nodeResourcesSummary">' + totalResources + " resources, " + updatedResources + " updated" + '</div>');
+
+    summarySubItem.heading.click();
+
+  };
+
   var showRunHeading = function(nodeHistoryContainer, nodeHistoryItem, runID){
     var run_start_datetime = new Date(Date.parse(nodeHistoryItem.start_time));
     if(nodeHistoryItem.success == true) {
@@ -130,6 +151,7 @@
   };
 
   var showNodeHistoryItem = function(nodeHistoryContainer, nodeName, nodeHistoryItem) {
+    showNodeSummary(nodeHistoryContainer, nodeHistoryItem);
     showNodeException(nodeHistoryContainer, nodeHistoryItem);
     showNodeRoles(nodeHistoryContainer, nodeHistoryItem);
     showNodeRecipes(nodeHistoryContainer, nodeHistoryItem);

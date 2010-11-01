@@ -121,6 +121,8 @@ div.nodeHistoryItemHeading{
   background: -moz-linear-gradient(top,  #ccc,  #999);
   padding:0.5em 0em 0.5em 1em;
   cursor:pointer;
+  border-top:1px solid #9f9f9f;
+  border-bottom:1px solid #6f6f6f;
 }
 
 span.hintToggleImg{
@@ -152,6 +154,8 @@ div#nodeDetailContainer{
   background-color:#efefef;
   width:68%;
   float:left;
+  padding-bottom:1em;
+  border:1px solid #696969;
 }
 
 h1.nodeDetailHeader{
@@ -183,6 +187,7 @@ h1.nodeDetailHeader{
 div.runHeadingContainer {
   line-height:3em;
   padding-left:1em;
+  border-bottom:1px solid #6f6f6f;
 }
 
 div.runHeadingContainer.successful{
@@ -198,7 +203,8 @@ div.runHeadingContainer.failed{
 }
 
 div.nodeHistoryItem{
-  padding-left:1em;
+/*  padding-left:0.25em;
+  padding-right:0.25em; */
 }
 
 div.resourceCodeContainer{
@@ -210,7 +216,7 @@ div pre{
 }
 
 pre.rubyCode{
-  border-top:1px solid #696969;
+  border:1px solid #696969;
   white-space:pre;
   width:40em;
 }
