@@ -173,7 +173,8 @@
 
       for (i = 0; i < nodeHistory.length; i += 1) {
         var nodeHistoryDivID = 'node_history_' + i;
-        var nodeHistoryItem = $.parseJSON(nodeHistory[i]);
+        //alert(nodeHistory[i]);
+        var nodeHistoryItem = nodeHistory[i]
         showRunHeading(nodeDetailContainer, nodeHistoryItem, i);
         nodeDetailContainer.append('<div id="' + nodeHistoryDivID + '" class="nodeHistoryItem"></div>');
         showNodeHistoryItem($('div#' + nodeHistoryDivID), nodeName, nodeHistoryItem);

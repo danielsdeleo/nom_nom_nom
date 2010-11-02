@@ -68,7 +68,7 @@ module NomNomNom
           halt(404, Yajl::Encoder.encode({:reason => "node #{node_name} not found"}))
         end
 
-        statuses = NomNomNom::Status.node_history(node_name)
+        statuses = NomNomNom::Status.node_history(node_name).map { |n| n.for_json }
         Yajl::Encoder.encode(statuses)
       end
 

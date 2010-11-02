@@ -19,28 +19,45 @@
 require 'yajl'
 require 'nom_nom_nom/status'
 require 'redis'
+require 'singleton'
 
 module NomNomNom
   module Server
-    module StatusModel
+
+    class DB
 
       module Connection
 
-        # this is probably nieve and terrible, but it works for now
-        def redis
-          r = Redis.new
-          yield r
-        ensure
-          r.client.disconnect
+        def db
+          DB.instance.connection
         end
 
       end
 
-      include Connection
+      include Singleton
+
+      attr_reader :connection
+
+      def initialize
+        @connection = nil
+        reset!
+      end
+
+      def reset!(connection_opts={})
+        @connection.client.disconnect if @connection
+        @connection = Redis.new(connection_opts)
+      end
+
+    end
+
+
+    module StatusModel
+
+      include DB::Connection
 
       module ClassMethods
 
-        include Connection
+        include DB::Connection
 
         def from_json(json)
           from_hash(Yajl::Parser.parse(json))
@@ -54,19 +71,20 @@ module NomNomNom
         end
 
         def failed_nodes
-          redis { |r| r.smembers("failed_nodes") }
+          db.smembers("failed_nodes")
         end
 
         def successful_nodes
-          redis { |r| r.sdiff("nodes", "failed_nodes") }
+          db.sdiff("nodes", "failed_nodes")
         end
 
         def node?(node_name)
-          redis { |r| r.sismember("nodes", node_name) }
+          db.sismember("nodes", node_name)
         end
 
         def node_history(node_name)
-          redis { |r| r.lrange(node_name, 0, 10) }
+          statuses = db.lrange(node_name, 0, 10)
+          Array(statuses).map { |s| from_hash(Yajl::Parser.parse(s)) }
         end
 
       end
@@ -78,16 +96,13 @@ module NomNomNom
       # list[node_name] => [status1, status2, ...]
 
       def save
-        redis do |r|
-          r.sadd("nodes", node)
+        db.sadd("nodes", node)
+        db.lpush(node, Yajl::Encoder.encode(self.for_json))
 
-          if success?
-            r.del("failed_nodes", node)
-          else
-            r.sadd("failed_nodes", node)
-          end
-
-          r.lpush(node, Yajl::Encoder.encode(self.for_json))
+        if success?
+          db.srem("failed_nodes", node)
+        else
+          db.sadd("failed_nodes", node)
         end
 
         self
