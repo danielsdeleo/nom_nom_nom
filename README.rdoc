@@ -1,0 +1,2 @@
+= NOM NOM NOM
+A report/notification handler for Chef that talks to a Redis-backed sinatra app to store historical data about your Chef client runs.
