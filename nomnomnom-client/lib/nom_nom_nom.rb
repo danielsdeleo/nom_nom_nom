@@ -16,6 +16,10 @@
 # limitations under the License.
 #
 
+require 'nom_nom_nom/version'
+require 'nom_nom_nom/status'
+require 'nom_nom_nom/status_handler'
+
 module NomNomNom
 
 end

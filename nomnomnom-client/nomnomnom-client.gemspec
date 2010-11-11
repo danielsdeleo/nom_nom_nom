@@ -18,7 +18,7 @@ Gem::Specification.new do |s|
   s.add_dependency "rest-client", "~> 1.6.1"
 
   s.bindir       = "bin"
-  s.executables  = %w( nomnomnom-test )
+  s.executables  = %w( nomnom-test )
   s.require_path = 'lib'
   s.files = %w(LICENSE README.rdoc) + Dir.glob("lib/**/*")
 end
