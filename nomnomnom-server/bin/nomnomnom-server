@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby
+
+Dir.chdir(File.expand_path('../..', __FILE__)) do
+  exec "bundle exec rackup #{ARGV.join(' ')} ./config.ru"
+end

@@ -17,7 +17,7 @@
 #
 
 require 'yajl'
-require 'nom_nom_nom/server/models/status_model'
+require 'models/status_model'
 
 module NomNomNom
   module Server

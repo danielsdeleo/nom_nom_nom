@@ -16,11 +16,10 @@
 # limitations under the License.
 #
 
-require 'sinatra/base'
-require 'mustache/sinatra'
-require 'nom_nom_nom/server/application'
+$:.unshift(File.expand_path(File.dirname(__FILE__) + '/..'))
+$:.unshift(File.expand_path(File.dirname(__FILE__) + '/../../nomnomnom-client/lib'))
 
-module NomNomNom
-  module Server
-  end
-end
+require 'pp'
+require 'nom_nom_nom'
+
+include NomNomNom
