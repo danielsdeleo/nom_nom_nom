@@ -8,7 +8,7 @@ gem 'yajl-ruby'
 gem "rack"
 gem "daemons"
 gem 'rake'
-gem 'chef', "0.9.10.rc"
+gem 'chef', "0.9.12"
 
 group(:development) do
   gem 'rspec', '~> 1.3.0'
