@@ -1,0 +1,28 @@
+= NomNomNom Client
+
+This is the NomNomNom client, which is a notification/exception handler for Chef. It's meant to integrate with the NomNomNom server and it quite useless without it.
+
+== Installation
+The easiest way to go is to install the client with rubygems:
+
+    gem install nomnomnom-client
+
+You need to do this for every Chef node you want status updates from. Automate the install by adding this to a base recipe or role:
+
+  gem_package("nomnomom-client")
+
+== Configure Chef
+To enable NomNomNom's status reports, add this to your client.rb
+
+  nomnomnom = NomNomNom::StatusHandler.new("NOMNOMNOM_SERVER_URL")
+
+  report_handlers    << nomnomnom
+  exception_handlers << nomnomnom
+
+== Testing the server
+This client includes a simple command line program to send generated notifications to the NomNomNom server. If the server is running on the localhost, you can invoke it like this:
+
+  nomnom-test http://localhost:9292/api/statuses
+
+There are several command line switches to change the generated status update. Run nomnom-test --help for more details.
+  
