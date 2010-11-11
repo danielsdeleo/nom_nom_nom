@@ -10,7 +10,11 @@ gem "daemons"
 gem 'rake'
 gem 'chef', "0.9.12"
 
-group(:development) do
-  gem 'rspec', '~> 1.3.0'
+group(:test) do
+  gem 'rspec', '~> 2.1.0'
   gem "thin"
+end
+
+group(:deployment) do
+  gem "unicorn", "~> 2.0.0"
 end
