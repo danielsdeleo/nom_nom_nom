@@ -16,12 +16,12 @@
 # limitations under the License.
 #
 
-require 'nom_nom_nom/version'
-require 'nom_nom_nom/status'
-require 'nom_nom_nom/status_handler'
 
-require 'nom_nom_nom/monkey_patch'
+###############################################################################
+# Chef's Resource#to_text keeps a blacklist of instance variables to skip
+# when generating the text representation of the resource. Add a few more.
+###############################################################################
 
-module NomNomNom
-
+[:@immediate_notifications, :@delayed_notifications, :@updated, :@updated_by_last_action].each do |ivar|
+  Chef::Resource::HIDDEN_IVARS << ivar unless Chef::Resource::HIDDEN_IVARS.include?(ivar)
 end
